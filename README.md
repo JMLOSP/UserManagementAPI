@@ -48,7 +48,7 @@ A RESTful API for managing user records, designed for HR and IT departments to e
 
 ### Prerequisites
 
-- .NET 9.0 SDK
+- .NET 8.0 SDK
 - Visual Studio Code or Visual Studio
 
 ### Running the Application
@@ -144,3 +144,4 @@ Currently uses in-memory storage for simplicity. In a production environment, th
 - Audit logging
 - API versioning
 - Unit and integration tests
+
