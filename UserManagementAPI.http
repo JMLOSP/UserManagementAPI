@@ -1,0 +1,184 @@
+@UserManagementAPI_HostAddress = http://localhost:5268
+@token = {{login.response.body.Token}}
+
+### ALTERNATIVE: Manual Token (If automatic extraction fails)
+### Copy token from login response and uncomment/update this line:
+# @token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...your-token-here
+
+### MANUAL TOKEN (Alternative approach)
+### Copy the token from login response and paste it here if automatic extraction doesn't work
+# @manualToken = paste-your-jwt-token-here
+
+### 1. Login as Admin (Execute this first to get JWT token)
+# @name login
+POST {{UserManagementAPI_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@techhive.com",
+  "password": "Admin123!"
+}
+
+### 2. Login as Regular User
+# @name userLogin
+POST {{UserManagementAPI_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "user@techhive.com",
+  "password": "User123!"
+}
+
+### 3. Validate JWT Token
+GET {{UserManagementAPI_HostAddress}}/api/auth/validate
+Authorization: Bearer {{token}}
+
+### 4. Get Test Credentials (Development Only)
+GET {{UserManagementAPI_HostAddress}}/api/auth/test-credentials
+
+### 5. Get all users (Protected - Requires Authentication)
+GET {{UserManagementAPI_HostAddress}}/api/users
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### 6. Get all users with pagination
+GET {{UserManagementAPI_HostAddress}}/api/users?page=1&pageSize=5
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### 7. Get user by ID (Protected)
+GET {{UserManagementAPI_HostAddress}}/api/users/1
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### 8. Get user by email (Protected)
+GET {{UserManagementAPI_HostAddress}}/api/users/by-email?email=john.doe@company.com
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### 9. Get users by department (Protected)
+GET {{UserManagementAPI_HostAddress}}/api/users/by-department/IT
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### 10. Create a new user (Protected)
+POST {{UserManagementAPI_HostAddress}}/api/users
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "FirstName": "Alice",
+  "LastName": "Brown",
+  "Email": "alice.brown@company.com",
+  "PhoneNumber": "+1-555-0126",
+  "Department": "Finance",
+  "Position": "Financial Analyst"
+}
+
+### 11. Update a user (Protected)
+PUT {{UserManagementAPI_HostAddress}}/api/users/1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "PhoneNumber": "+1-555-9999",
+  "Position": "Senior Software Developer"
+}
+
+### 12. Check if user exists (Protected)
+HEAD {{UserManagementAPI_HostAddress}}/api/users/1
+Authorization: Bearer {{token}}
+
+### 13. Delete a user (Protected)
+DELETE {{UserManagementAPI_HostAddress}}/api/users/1
+Authorization: Bearer {{token}}
+
+### 14. Test without authentication (Should return 401 Unauthorized)
+GET {{UserManagementAPI_HostAddress}}/api/users
+Accept: application/json
+
+### 15. Test with invalid token (Should return 401 Unauthorized)
+GET {{UserManagementAPI_HostAddress}}/api/users
+Accept: application/json
+Authorization: Bearer invalid-token-here
+
+###############################################################################
+# ADDITIONAL TEST SCENARIOS
+###############################################################################
+
+### 16. Test user creation with validation errors
+POST {{UserManagementAPI_HostAddress}}/api/users
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "FirstName": "",
+  "LastName": "Test",
+  "Email": "invalid-email",
+  "PhoneNumber": "123",
+  "Department": "",
+  "Position": "Test Position"
+}
+
+### 17. Test user creation with duplicate email
+POST {{UserManagementAPI_HostAddress}}/api/users
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "FirstName": "Duplicate",
+  "LastName": "User",
+  "Email": "john.doe@company.com",
+  "PhoneNumber": "+1-555-0000",
+  "Department": "IT",
+  "Position": "Developer"
+}
+
+### 18. Test getting non-existent user (Should return 404)
+GET {{UserManagementAPI_HostAddress}}/api/users/999
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### 19. Test updating non-existent user (Should return 404)
+PUT {{UserManagementAPI_HostAddress}}/api/users/999
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "PhoneNumber": "+1-555-0000"
+}
+
+### 20. Test deleting non-existent user (Should return 404)
+DELETE {{UserManagementAPI_HostAddress}}/api/users/999
+Authorization: Bearer {{token}}
+
+### 21. Test expired token scenario (Manually modify token to test)
+GET {{UserManagementAPI_HostAddress}}/api/users
+Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.expired.token
+
+###############################################################################
+# PERFORMANCE AND PAGINATION TESTS
+###############################################################################
+
+### 22. Test pagination - First page
+GET {{UserManagementAPI_HostAddress}}/api/users?page=1&pageSize=2
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### 23. Test pagination - Second page
+GET {{UserManagementAPI_HostAddress}}/api/users?page=2&pageSize=2
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### 24. Test pagination with invalid parameters
+GET {{UserManagementAPI_HostAddress}}/api/users?page=0&pageSize=0
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### 25. Test pagination with large page size
+GET {{UserManagementAPI_HostAddress}}/api/users?page=1&pageSize=1000
+Accept: application/json
+Authorization: Bearer {{token}}
+
+###
